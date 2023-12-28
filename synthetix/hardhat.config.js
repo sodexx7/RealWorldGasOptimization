@@ -37,7 +37,10 @@ module.exports = {
 			{
 				version: '0.8.14',
 				settings: {
-					evmVersion: 'shanghai',
+					optimizer: {
+						enabled: true,
+						runs: 200,
+					},
 				},
 			},
 		],
@@ -106,12 +109,12 @@ module.exports = {
 		},
 	},
 	gasReporter: {
-		enabled: false,
-		showTimeSpent: true,
-		gasPrice: 20,
-		currency: 'USD',
-		maxMethodDiff: 25, // CI will fail if gas usage is > than this %
-		outputFile: 'test-gas-used.log',
+		enabled: true,
+		// showTimeSpent: true,
+		// gasPrice: 20,
+		// currency: 'USD',
+		// maxMethodDiff: 25, // CI will fail if gas usage is > than this %
+		// outputFile: 'test-gas-used.log',
 	},
 	mocha: {
 		timeout: 300e3, // 300s
