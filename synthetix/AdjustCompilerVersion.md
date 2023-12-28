@@ -38,8 +38,6 @@
 * Acutally compiler version version: '0.8.14'        
 
 
-* test file
-    * npx hardhat test test/contracts/StakingRewardsNew.js
-    [StakingRewardsNew.js](test/contracts/StakingRewardsNew.js)
+
 
 

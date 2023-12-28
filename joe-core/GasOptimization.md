@@ -1,6 +1,10 @@
 ## TARGET SMART CONTRACT
 *  [TokenVestingNew](contracts/TokenVestingNew.sol) based on [TokenVesting](contracts/TokenVesting.sol)
-*  yarn test:gas test/TokenVestingNew.test.ts  [TokenVestingNew.test.ts](test/TokenVestingNew.test.ts)
+*  test file
+    * yarn test:gas test/TokenVestingNew.test.ts
+    * [TokenVestingNew.test.ts](test/TokenVestingNew.test.ts)
+
+
 ## CHANGED POINTS FOR CONVERTING COMPILER VERSION 
 1. solidity compiler chaning from ^0.6.0 to ^0.8.0
 2. Using a new version of Ownable, SafeERC20, which is OpenZeppelin Contracts v4.4.1

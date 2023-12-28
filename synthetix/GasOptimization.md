@@ -1,6 +1,8 @@
 ## TARGET SMART CONTRACT
 *  [StakingRewardsNew](contracts/StakingRewardsNew.sol) based on [StakingRewards](contracts/StakingRewards.sol)
-
+*  test file
+    * REPORT_GAS=true npx hardhat test test/contracts/StakingRewardsNew.js
+    * [StakingRewardsNew.js](test/contracts/StakingRewardsNew.js)
 ## CHANGED POINTS FOR CONVERTING COMPILER VERSION 
 * [changed points](./AdjustCompilerVersion.md) 
 
@@ -12,7 +14,8 @@
 ## PROTOCOL INTRODUCTION
 
 ## GAS COST(CURRENT)
-- OriginalConsumedGas to check again (StakingRewardsNew using ^0.8.0, others not using )
+- OriginalConsumedGas
+  * ***As StakingRewardsNew based on many contracts(I have delete these contracts in the blew table) which use another compiler version(0.5.16), the blew compiler version shows 0.8.14, but the optimizer setting{ enabled: true, runs: 200 } doesn't show.  perhaps there are some compitable problem with these. The blew just give rough estimatation***
   <img src="OriginalConsumedGas.png" alt="external_result" width="1000"/>
 
 

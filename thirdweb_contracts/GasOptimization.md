@@ -1,6 +1,8 @@
 ## TARGET SMART CONTRACT
 *  [Staking721.sol](contracts/extension/Staking721.sol)
-*  forge gas test --mc StakingExtensionTest TODO CHECK   [StakingExtension.t.sol](./src/test/sdk/extension/StakingExtension.t.sol)
+*  test file
+    * forge gas test --mc StakingExtensionTest TODO CHECK
+    * [StakingExtension.t.sol](./src/test/sdk/extension/StakingExtension.t.sol)
 
 ## ENVIRONMENT INFO
 * evm version london

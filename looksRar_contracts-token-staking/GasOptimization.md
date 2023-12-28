@@ -1,6 +1,8 @@
 ## TARGET SMART CONTRACT
 *  [tokenDistributor](contracts/TokenDistributor.sol)
-*  yarn test test/tokenDistributor.test.ts  [tokenDistributor.test.ts](test/tokenDistributor.test.ts)
+*  test file 
+   * yarn test test/tokenDistributor.test.ts  
+   * [tokenDistributor.test.ts](test/tokenDistributor.test.ts)
 
 ## ENVIRONMENT INFO
 * evm version london
