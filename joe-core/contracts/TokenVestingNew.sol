@@ -193,7 +193,7 @@ contract TokenVestingNew is OwnedNew {
         } else if (block.timestamp >= _start + _duration || _revoked[address(token)]) {
             return totalBalance;
         } else {
-            return totalBalance * (block.timestamp - _start) / _duration;
+            return (totalBalance * (block.timestamp - _start)) / _duration;
         }
     }
 }

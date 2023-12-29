@@ -16,6 +16,15 @@
 
 
 ## PROTOCOL INTRODUCTION
+* As offical web introduction: One-stop-shop decentralized trading on Avalanche. 
+
+* **For the TokenVesting, whose main feature is released the token( TokenVesting holds) to the beneficiary address according to limited period.If in the duration, released the token in a linear fashion, if beyond the start+duration,relased all the vested balance.(this logic seems wired, todo check). Meanwhile the owner can revoke the given token's balance either portion or all.**
+
+* TokenVesting use below contracts
+    1. Safe or Privilege management. SafeERC20 Owned
+
+* Quesiton. Now doesn't see other smart contracts are using this contract meanwhile doesn't find this contract have been deployed.
+
 
 ## GAS COST(CURRENT)
 * OriginalConsumedGas
