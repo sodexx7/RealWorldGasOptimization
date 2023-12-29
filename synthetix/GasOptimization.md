@@ -12,6 +12,22 @@
 
 
 ## PROTOCOL INTRODUCTION
+* As protocol's intro, Synthetix is a crypto-backed synthetic asset platform. Core Token is SNX(SNX holders can stake SNX to issue Synths, on-chain synthetic assets). Support two types token,Perpetual Futures,Spot Synths.
+
+
+* For StakingRewards contract, user can stake the stakingToken, then can get the rewardsToken. Both  stakingToken and rewardsToken are ERC20 token, stakingToken can iBTC, or iETH...,rewardsToken is SNX. But for now(20231228) the activities involved with the corrospending's contract is very low. [addresses.md](https://github.com/Synthetixio/synthetix-docs/blob/master/content/addresses.md)
+
+* StakingRewards Contract based on the below contracts
+    1. StakingRewards, basic function stake,withdraw,getRewards
+    2. Safe or Privilege management. Pausable,ReentrancyGuard,SafeERC20
+    3. Rewards management, which was controlled by the RewardsDistribution.
+
+* The core feature or the core desgin is how to track each user's rewards,how to update the rewards's info? Who can edit the rewards info and add the rewards to the StakingReward contract.
+    * **Briefly, each time the user interact(stake,withdraw,getRewards) with contract, the user's rewards info will updates.**
+    * **rewardPerTokenStored records the accumulated rewards per staking Token, Calcuating the user's rewards by rewardPerTokenStored and userRewardPerTokenPaid.** 
+    * **RewardsDistribution contract can edit rewards Info, and will call StakingReward's notifyRewardAmount function while executing distributeRewards, meanwhile stakingToken's rewards info is updating.** 
+    * More details can see [staking-algorithm](https://www.rareskills.io/post/staking-algorithm)
+
 
 ## GAS COST(CURRENT)
 - OriginalConsumedGas
@@ -24,8 +40,20 @@
 
 
 
+
+
 ## GAS OPTIMAL LIST
 
+
+
+## GAS OPTIMAL LIST
+
+Some considerations
+* deployment 
+bytecode size
+12055
+deployedBytecode size
+10841
 
 
 
@@ -45,3 +73,5 @@
     * [addresses.md](https://github.com/Synthetixio/synthetix-docs/blob/master/content/addresses.md)
     * [StakingRewardsiBTC on-chain(Ethereum) address]( https://etherscan.io/address/0x167009dcDA2e49930a71712D956f02cc980DcC1b#code) 
 
+3. dune
+https://dune.com/synthetix_community/synthetix-stats

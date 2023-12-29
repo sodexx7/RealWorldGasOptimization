@@ -83,6 +83,13 @@ contract('StakingRewardsNew', accounts => {
 			contract: 'StakingRewardsNew',
 			args: [owner, rewardsDistribution.address, rewardsToken.address, stakingToken.address],
 		});
+		const bytescode = await artifacts.require('StakingRewardsNew').bytecode;
+		console.log('bytecode size');
+		console.log((bytescode.length - 2) / 2);
+
+		const deployedBytecode = await artifacts.require('StakingRewardsNew').deployedBytecode;
+		console.log('deployedBytecode size');
+		console.log((deployedBytecode.length - 2) / 2);
 
 		await Promise.all([
 			rewardsDistribution.setAuthority(authority, { from: owner }),
