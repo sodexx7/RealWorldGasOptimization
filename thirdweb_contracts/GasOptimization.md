@@ -10,7 +10,16 @@
 
 
 ## PROTOCOL INTRODUCTION
+> Thirdweb is a complete web3 development framework that provides everything you need to connect your apps and games to decentralized networks.
+* Staking721 is a basic template contract, user staking NFT then get rewards. More features can build on this contract according to their demands, such as how to send rewards.  
+* The main features about this contract are recording/calculating user's rewards, updating StakingCondition, supporting stake many token each time. **Now, for _calculateRewards perhaps there are some problem?**
+* The related contracts
+    1. Depend on which contracts？
+        * IStaking721，ERC721,ReentrancyGuard
+    2. Which contracts based on this contract?
+        * Staking721Base, just a demo contract using Staking721，ERC721
 
+**TODO check this logic:test_state_setTimeUnit in [StakingExtension.t.sol](./src/test/sdk/extension/StakingExtension.t.sol)**
 ## GAS COST(CURRENT)
 - OriginalConsumedGas
   <img src="OriginalConsumedGas.png" alt="external_result" width="1000"/>
