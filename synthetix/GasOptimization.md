@@ -33,7 +33,7 @@
 - OriginalConsumedGas
   * ***As StakingRewardsNew based on many contracts(I have delete these contracts in the blew table) which use another compiler version(0.5.16), the blew compiler version shows 0.8.14, but the optimizer setting{ enabled: true, runs: 200 } doesn't show.  perhaps there are some compitable problem with these. The blew just give rough estimatation***
   <img src="OriginalConsumedGas.png" alt="external_result" width="1000"/>
-
+- related code version: 970f1daadfb6ea2414f9612f40d66e684481f042
 
 ## GAS COST(AFTER OPTIMISING)
 
@@ -43,25 +43,12 @@
 
 
 ## GAS OPTIMAL LIST
-
-
-
-## GAS OPTIMAL LIST
-
-Some considerations
+[GasOptimizationList](GasOptimizationList.md)
 * deployment 
 bytecode size
 12055
 deployedBytecode size
 10841
-
-
-
-
-
-
-
-
 
 
 ## PROTOCOL MATERIALS

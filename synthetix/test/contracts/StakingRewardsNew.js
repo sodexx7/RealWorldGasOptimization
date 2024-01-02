@@ -1,4 +1,4 @@
-const { contract,log } = require('hardhat');
+const { contract, web3 } = require('hardhat');
 const { toBN } = require('web3-utils');
 
 const { toBytes32 } = require('../..');
@@ -7,6 +7,7 @@ const {
 	ensureOnlyExpectedMutativeFunctions,
 	setupPriceAggregators,
 	updateAggregatorRates,
+	onlyGivenAddressCanInvokeNew,
 } = require('./helpers');
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 const { mockToken, setupAllContracts, setupContract } = require('./setup');
@@ -182,7 +183,7 @@ contract('StakingRewardsNew', accounts => {
 		});
 	});
 
-	describe('Pausable', async () => {
+	describe('PausableNew', async () => {
 		beforeEach(async () => {
 			await stakingRewards.setPaused(true, { from: owner });
 		});
@@ -190,10 +191,9 @@ contract('StakingRewardsNew', accounts => {
 			const totalToStake = toUnit('100');
 			await stakingToken.transfer(stakingAccount1, totalToStake, { from: owner });
 			await stakingToken.approve(stakingRewards.address, totalToStake, { from: stakingAccount1 });
-
 			await assert.revert(
 				stakingRewards.stake(totalToStake, { from: stakingAccount1 }),
-				'This action cannot be performed while the contract is paused'
+				web3.eth.abi.encodeFunctionSignature('EnforcedPause()') // error EnforcedPause();  0xd93c0665 // todo should check web3.eth.abi.encodeFunctionSignature('EnforcedPause()') can work??
 			);
 		});
 		it('should not revert calling stake() when unpaused', async () => {
@@ -207,20 +207,19 @@ contract('StakingRewardsNew', accounts => {
 		});
 	});
 
-	describe('External Rewards Recovery', () => {
+	describe('External Rewards RecoveryNew', () => {
 		const amount = toUnit('5000');
 		beforeEach(async () => {
 			// Send ERC20 to StakingRewards Contract
 			await externalRewardsToken.transfer(stakingRewards.address, amount, { from: owner });
 			assert.bnEqual(await externalRewardsToken.balanceOf(stakingRewards.address), amount);
 		});
-		it('only owner can call recoverERC20', async () => {
-			await onlyGivenAddressCanInvoke({
+		it('only owner can call recoverERC20New', async () => {
+			await onlyGivenAddressCanInvokeNew({
 				fnc: stakingRewards.recoverERC20,
 				args: [externalRewardsToken.address, amount],
 				address: owner,
 				accounts,
-				reason: 'Only the contract owner may perform this action',
 			});
 		});
 		it('should revert if recovering staking token', async () => {
@@ -228,7 +227,7 @@ contract('StakingRewardsNew', accounts => {
 				stakingRewards.recoverERC20(stakingToken.address, amount, {
 					from: owner,
 				}),
-				'Cannot withdraw the staking token'
+				web3.eth.abi.encodeFunctionSignature('UnableWithDarawStakingToken()') // todo check
 			);
 		});
 		it('should retrieve external token from StakingRewards and reduce contracts balance', async () => {
@@ -323,7 +322,10 @@ contract('StakingRewardsNew', accounts => {
 		});
 
 		it('cannot stake 0', async () => {
-			await assert.revert(stakingRewards.stake('0'), 'Cannot stake 0');
+			await assert.revert(
+				stakingRewards.stake('0'),
+				web3.eth.abi.encodeFunctionSignature('StakeAmountMustGTZero()')
+			);
 		});
 	});
 
@@ -456,7 +458,7 @@ contract('StakingRewardsNew', accounts => {
 
 			await assert.revert(
 				stakingRewards.setRewardsDuration(seventyDays, { from: owner }),
-				'Previous rewards period must be complete before changing the duration for the new period'
+				web3.eth.abi.encodeFunctionSignature('PreviousRewardsShouldDoneBeforeChangDuration()')
 			);
 		});
 		it('should update when setting setRewardsDuration after the period has finished', async () => {
@@ -566,7 +568,10 @@ contract('StakingRewardsNew', accounts => {
 		});
 
 		it('cannot withdraw 0', async () => {
-			await assert.revert(stakingRewards.withdraw('0'), 'Cannot withdraw 0');
+			await assert.revert(
+				stakingRewards.withdraw('0'),
+				web3.eth.abi.encodeFunctionSignature('WithDrawAmountMustGTZero()')
+			);
 		});
 	});
 

@@ -197,6 +197,52 @@ module.exports = {
 		}
 	},
 
+	async onlyGivenAddressCanInvokeNew({
+		fnc,
+		args,
+		accounts,
+		address = undefined,
+		skipPassCheck = false,
+		reason = undefined,
+		value = undefined,
+	}) {
+		for (const user of accounts) {
+			if (user === address) {
+				continue;
+			}
+
+			const options = { from: user };
+			if (value) {
+				options.value = value;
+			}
+
+			await assert.revert(
+				fnc(...args, options),
+				web3.eth.abi.encodeFunctionCall(
+					{
+						name: 'OwnableInvalidOwner',
+						type: 'function',
+						inputs: [
+							{
+								type: 'address',
+								name: 'owner',
+							},
+						],
+					},
+					[user]
+				)
+			);
+		}
+		if (!skipPassCheck && address) {
+			const options = { from: address };
+			if (value) {
+				options.value = value;
+			}
+			await fnc(...args, options);
+		}
+	},
+
+
 	async onlyGivenAddressesCanInvoke({
 		fnc,
 		args,

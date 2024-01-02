@@ -8,17 +8,17 @@
     1. add  ***New(suffix) for the changed files
     2. delete SafeMath in StakingRewardsNew
     3. add new files(**below are using OpenZeppelin Contracts v4.4.1.**)
-        * SafeERC20 => SafeERC20New
-        * ReentrancyGuard => ReentrancyGuardNew
-        * IERC20 
-        * Address
-        * ReentrancyGuardNew
-        * SafeERC20New
+        * SafeERC20 =>  [SafeERC20New](contracts/openzeppelin-contracts-new/SafeERC20New.sol)
+        * ReentrancyGuard => [ReentrancyGuardNew](contracts/openzeppelin-contracts-new/ReentrancyGuardNew.sol)
+        * [IERC20](contracts/openzeppelin-contracts-new/IERC20.sol)    
+        * [Address](contracts/openzeppelin-contracts-new/Address.sol)    
+        * [ReentrancyGuardNew](contracts/openzeppelin-contracts-new/ReentrancyGuardNew.sol)    
+        * [SafeERC20New](contracts/openzeppelin-contracts-new/SafeERC20New.sol)    
         * **below are just convert compiler version to ^0.8.0**
-        * IStakingRewardsNew
-        * RewardsDistributionRecipientNew
-        * OwnedNew
-        * PausableNew
+        * [IStakingRewardsNew](contracts/interfaces/IStakingRewardsNew.sol)
+        * [RewardsDistributionRecipientNew](contracts/RewardsDistributionRecipientNew.sol)
+        * [OwnedNew](contracts/openzeppelin-contracts-new/OwnedNew.sol)
+        * [PausableNew](contracts/openzeppelin-contracts-new/PausableNew.sol)
 4. Test file
     * StakingRewardsNew.js, which only converts StakingRewards to StakingRewardsNew, ReentrancyGuard to ReentrancyGuardNew,Owned to OwnedNew.
 5. Some problem I have came across

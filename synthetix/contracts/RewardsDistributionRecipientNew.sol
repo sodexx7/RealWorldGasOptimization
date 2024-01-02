@@ -7,10 +7,14 @@ import "./openzeppelin-contracts-new/OwnedNew.sol";
 abstract contract RewardsDistributionRecipientNew is OwnedNew {
     address public rewardsDistribution;
 
+    error CallerNotRewardsDistribution();
+
     function notifyRewardAmount(uint256 reward) external virtual;
 
     modifier onlyRewardsDistribution() {
-        require(msg.sender == rewardsDistribution, "Caller is not RewardsDistribution contract");
+        if(msg.sender != rewardsDistribution){
+            revert CallerNotRewardsDistribution();
+        }
         _;
     }
 

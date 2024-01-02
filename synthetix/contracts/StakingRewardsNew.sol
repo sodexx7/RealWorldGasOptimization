@@ -16,19 +16,31 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
 
     /* ========== STATE VARIABLES ========== */
 
-    IERC20 public rewardsToken;
-    IERC20 public stakingToken;
-    uint256 public periodFinish = 0;
-    uint256 public rewardRate = 0;
-    uint256 public rewardsDuration = 7 days;
-    uint256 public lastUpdateTime;
-    uint256 public rewardPerTokenStored;
+    IERC20  public immutable  rewardsToken;
+    IERC20  public immutable  stakingToken;
+    uint256 public  periodFinish;
+    uint256 public  rewardRate = 1;
+    uint256 public  rewardsDuration = 7 days;
 
-    mapping(address => uint256) public userRewardPerTokenPaid;
-    mapping(address => uint256) public rewards;
+    uint256 private lastUpdateTime;
+    uint256 private rewardPerTokenStored;
+
+    mapping(address => uint256) private userRewardPerTokenPaid;
+    mapping(address => uint256) private rewards;
 
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
+
+    /* ========== CUSTOMER ERROR ========== */
+    error StakeAmountMustGTZero();
+
+    error WithDrawAmountMustGTZero();
+
+    error ProvidedRewardTooHigh();
+
+    error UnableWithDarawStakingToken();
+
+    error PreviousRewardsShouldDoneBeforeChangDuration();
 
     /* ========== CONSTRUCTOR ========== */
 
@@ -37,14 +49,13 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
         address _rewardsDistribution,
         address _rewardsToken,
         address _stakingToken
-    ) public OwnedNew(_owner) {
+    ) OwnedNew(_owner) payable {
         rewardsToken = IERC20(_rewardsToken);
         stakingToken = IERC20(_stakingToken);
         rewardsDistribution = _rewardsDistribution;
     }
 
     /* ========== VIEWS ========== */
-
     function totalSupply() external view returns (uint256) {
         return _totalSupply;
     }
@@ -78,7 +89,9 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     function stake(uint256 amount) external nonReentrant notPaused updateReward(msg.sender) {
-        require(amount > 0, "Cannot stake 0");
+      if(amount == 0){
+            revert StakeAmountMustGTZero();
+        }
         _totalSupply = _totalSupply + amount;
         _balances[msg.sender] = _balances[msg.sender] + amount;
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
@@ -86,7 +99,10 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
     }
 
     function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
-        require(amount > 0, "Cannot withdraw 0");
+        if(amount == 0){
+            revert WithDrawAmountMustGTZero();
+        }
+
         _totalSupply = _totalSupply - amount;
         _balances[msg.sender] = _balances[msg.sender] - amount;
         stakingToken.safeTransfer(msg.sender, amount);
@@ -123,7 +139,9 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
         // very high values of rewardRate in the earned and rewardsPerToken functions;
         // Reward + leftover must be less than 2^256 / 10^18 to avoid overflow.
         uint balance = rewardsToken.balanceOf(address(this));
-        require(rewardRate <= balance / rewardsDuration, "Provided reward too high");
+        if(rewardRate > balance / rewardsDuration ){
+            revert ProvidedRewardTooHigh();
+        }
 
         lastUpdateTime = block.timestamp;
         periodFinish = block.timestamp + rewardsDuration;
@@ -132,16 +150,18 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
 
     // Added to support recovering LP Rewards from other systems such as BAL to be distributed to holders
     function recoverERC20(address tokenAddress, uint256 tokenAmount) external onlyOwner {
-        require(tokenAddress != address(stakingToken), "Cannot withdraw the staking token");
+        if(tokenAddress == address(stakingToken)){
+            revert UnableWithDarawStakingToken();
+        }
         IERC20(tokenAddress).safeTransfer(owner, tokenAmount);
         emit Recovered(tokenAddress, tokenAmount);
     }
 
     function setRewardsDuration(uint256 _rewardsDuration) external onlyOwner {
-        require(
-            block.timestamp > periodFinish,
-            "Previous rewards period must be complete before changing the duration for the new period"
-        );
+       
+        if(block.timestamp <= periodFinish){
+            revert PreviousRewardsShouldDoneBeforeChangDuration();
+        }
         rewardsDuration = _rewardsDuration;
         emit RewardsDurationUpdated(rewardsDuration);
     }

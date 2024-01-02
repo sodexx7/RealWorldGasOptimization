@@ -9,9 +9,18 @@ abstract contract PausableNew is OwnedNew {
     uint public lastPauseTime;
     bool public paused;
 
-    constructor() {
+     /**
+     * @dev The operation failed because the contract is paused.
+     */
+     error EnforcedPause();
+
+
+    constructor() payable {
         // This contract is abstract, and thus cannot be instantiated directly
-        require(owner != address(0), "Owner must be set");
+        if (owner == address(0)) {
+            revert OwnableInvalidOwner(address(0));
+        }
+
         // Paused will be false, and lastPauseTime will be 0 upon initialisation
     }
 
@@ -40,7 +49,9 @@ abstract contract PausableNew is OwnedNew {
     event PauseChanged(bool isPaused);
 
     modifier notPaused {
-        require(!paused, "This action cannot be performed while the contract is paused");
+        if(paused){
+            revert EnforcedPause();
+        }
         _;
     }
 }

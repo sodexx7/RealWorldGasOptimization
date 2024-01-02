@@ -7,8 +7,20 @@ contract OwnedNew {
     address public owner;
     address public nominatedOwner;
 
-    constructor(address _owner) {
-        require(_owner != address(0), "Owner address cannot be 0");
+    /**
+     * @dev The caller account is not authorized to perform an operation.
+     */
+     error OwnableUnauthorizedAccount(address account);
+
+    /**
+     * @dev The owner is not a valid owner account. (eg. `address(0)`)
+     */
+     error OwnableInvalidOwner(address owner);
+
+    constructor(address _owner) payable {
+        if(_owner == address(0)){
+            revert OwnableInvalidOwner(address(0));
+        }
         owner = _owner;
         emit OwnerChanged(address(0), _owner);
     }
@@ -19,20 +31,23 @@ contract OwnedNew {
     }
 
     function acceptOwnership() external {
-        require(msg.sender == nominatedOwner, "You must be nominated before you can accept ownership");
+        if(msg.sender != nominatedOwner){
+            revert OwnableUnauthorizedAccount(msg.sender);
+        }
+
+        
         emit OwnerChanged(owner, nominatedOwner);
         owner = nominatedOwner;
         nominatedOwner = address(0);
     }
 
     modifier onlyOwner {
-        _onlyOwner();
+        if(msg.sender != owner){
+            revert OwnableInvalidOwner(msg.sender);
+        }
         _;
     }
 
-    function _onlyOwner() private view {
-        require(msg.sender == owner, "Only the contract owner may perform this action");
-    }
 
     event OwnerNominated(address newOwner);
     event OwnerChanged(address oldOwner, address newOwner);

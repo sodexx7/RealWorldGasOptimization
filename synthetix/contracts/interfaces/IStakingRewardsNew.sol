@@ -18,7 +18,7 @@ interface IStakingRewardsNew {
 
     // function rewardsToken() external view returns (address);
 
-    // function totalSupply() external view returns (uint256);
+    function totalSupply() external view returns (uint256);
 
     // Mutative
 
