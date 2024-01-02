@@ -27,9 +27,9 @@ describe.only("TokenVestingNew", function () {
   })
 
   it("should only allow release of tokens once cliff is passed", async function () {
-    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("TokenVesting: no tokens are due")
+    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("NoUnreleasedToken()")
     await increase(duration.days(6))
-    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("TokenVesting: no tokens are due")
+    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("NoUnreleasedToken()")
     await increase(duration.days(1))
     await this.tokenVesting.release(this.joe.address)
     expect(await this.joe.balanceOf(this.alice.address)).to.gt(0)
@@ -46,7 +46,7 @@ describe.only("TokenVestingNew", function () {
   it("can revoke tokens immediately", async function () {
     await this.tokenVesting.revoke(this.joe.address)
     await increase(duration.days(14))
-    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("TokenVesting: no tokens are due")
+    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("NoUnreleasedToken()")
   })
 
   it("revoking leaves some tokens vestable", async function () {
@@ -58,13 +58,13 @@ describe.only("TokenVestingNew", function () {
     expect(await this.joe.balanceOf(this.tokenVesting.address)).to.lt(100)
 
     await increase(duration.days(7))
-    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("TokenVesting: no tokens are due")
+    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("NoUnreleasedToken()")
   })
 
   it("emergency revoking leaves no tokens vestable", async function () {
     await increase(duration.days(10))
     await this.tokenVesting.emergencyRevoke(this.joe.address)
-    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("TokenVesting: no tokens are due")
+    await expect(this.tokenVesting.release(this.joe.address)).to.be.revertedWith("NoUnreleasedToken()")
   })
 
   after(async function () {

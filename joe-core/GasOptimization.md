@@ -7,8 +7,8 @@
 
 ## CHANGED POINTS FOR CONVERTING COMPILER VERSION 
 1. solidity compiler chaning from ^0.6.0 to ^0.8.0
-2. Using a new version of Ownable, SafeERC20, which is OpenZeppelin Contracts v4.4.1
-3. delete SafeMath,TokenVesting => TokenVestingNew
+2. Using a new version of [Ownable](contracts/openzeppelin-contracts-new/OwnedNew.sol), [SafeERC20](contracts/openzeppelin-contracts-new/SafeERC20New.sol), which is OpenZeppelin Contracts v4.4.1
+3. delete SafeMath,TokenVesting => TokenVestingNew 
 
 ## ENVIRONMENT INFO
 * evm version istanbul
@@ -30,6 +30,7 @@
 * OriginalConsumedGas
 <img src="OriginalConsumedGas.png" alt="external_result" width="1000"/>
 
+- related code version: 9c61416c8068d7050e8999cb66ef352795e04a7f
 
 ## GAS COST(AFTER OPTIMISING)
 
@@ -38,7 +39,7 @@
 
 ## GAS OPTIMAL LIST
 
-
+* [GasOptimalList](GasOptimalList.md)
 
 
 

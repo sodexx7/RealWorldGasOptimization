@@ -24,17 +24,32 @@ contract TokenVestingNew is OwnedNew {
     event TokenVestingRevoked(address token);
 
     // beneficiary of tokens after they are released
-    address private _beneficiary;
+    address public immutable _beneficiary;
 
     // Durations and timestamps are expressed in UNIX time, the same units as block.timestamp.
-    uint256 private _cliff;
-    uint256 private _start;
-    uint256 private _duration;
+    uint256 public _cliff;
+    uint256 public _start;
+    uint256 public _duration;
 
-    bool private _revocable;
+    bool public _revocable;
 
     mapping(address => uint256) private _released;
     mapping(address => bool) private _revoked;
+
+    // custom error
+    error InvalidZeroAddress(); // TokenVesting: beneficiary is the zero address
+
+    error CliffBeyondDuration(); // "TokenVesting: cliff is longer than duration"
+
+    error DurationIsZero();// duration is 0
+
+    error FinalTimeBeyondCurTime(); // TokenVesting: final time is before current time"
+
+    error NoUnreleasedToken(); // TokenVesting: no tokens are due
+    
+    error CannotRevoke();      //  TokenVesting: cannot revoke
+
+    error AlreadyRevoked();  // token already revoked
 
     /**
      * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
@@ -52,13 +67,21 @@ contract TokenVestingNew is OwnedNew {
         uint256 cliffDuration,
         uint256 duration,
         bool revocable
-    ) public {
-        require(beneficiary != address(0), "TokenVesting: beneficiary is the zero address");
+    ) OwnedNew(msg.sender) {
+        if(beneficiary == address(0)){
+            revert InvalidZeroAddress();
+        }
         // solhint-disable-next-line max-line-length
-        require(cliffDuration <= duration, "TokenVesting: cliff is longer than duration");
-        require(duration > 0, "TokenVesting: duration is 0");
+        if(cliffDuration > duration){
+            revert CliffBeyondDuration();
+        }
+        if(duration == 0 ){
+            revert DurationIsZero();
+        }
         // solhint-disable-next-line max-line-length
-        require(start+ duration > block.timestamp, "TokenVesting: final time is before current time");
+        if(start+ duration <= block.timestamp){
+            revert FinalTimeBeyondCurTime();
+        }
 
         _beneficiary = beneficiary;
         _revocable = revocable;
@@ -67,40 +90,6 @@ contract TokenVestingNew is OwnedNew {
         _start = start;
     }
 
-    /**
-     * @return the beneficiary of the tokens.
-     */
-    function beneficiary() public view returns (address) {
-        return _beneficiary;
-    }
-
-    /**
-     * @return the cliff time of the token vesting.
-     */
-    function cliff() public view returns (uint256) {
-        return _cliff;
-    }
-
-    /**
-     * @return the start time of the token vesting.
-     */
-    function start() public view returns (uint256) {
-        return _start;
-    }
-
-    /**
-     * @return the duration of the token vesting.
-     */
-    function duration() public view returns (uint256) {
-        return _duration;
-    }
-
-    /**
-     * @return true if the vesting is revocable.
-     */
-    function revocable() public view returns (bool) {
-        return _revocable;
-    }
 
     /**
      * @return the amount of the token released.
@@ -123,7 +112,9 @@ contract TokenVestingNew is OwnedNew {
     function release(IERC20 token) public {
         uint256 unreleased = _releasableAmount(token);
 
-        require(unreleased > 0, "TokenVesting: no tokens are due");
+        if(unreleased == 0){
+            revert NoUnreleasedToken();
+        }
 
         _released[address(token)] = _released[address(token)] + unreleased;
 
@@ -138,8 +129,12 @@ contract TokenVestingNew is OwnedNew {
      * @param token ERC20 token which is being vested
      */
     function revoke(IERC20 token) public onlyOwner {
-        require(_revocable, "TokenVesting: cannot revoke");
-        require(!_revoked[address(token)], "TokenVesting: token already revoked");
+        if(!_revocable){
+            revert CannotRevoke();
+        }
+        if(_revoked[address(token)]){
+            revert AlreadyRevoked();
+        }
 
         uint256 balance = token.balanceOf(address(this));
 
@@ -148,7 +143,7 @@ contract TokenVestingNew is OwnedNew {
 
         _revoked[address(token)] = true;
 
-        token.safeTransfer(owner(), refund);
+        token.safeTransfer(owner, refund);
 
         emit TokenVestingRevoked(address(token));
     }
@@ -160,14 +155,18 @@ contract TokenVestingNew is OwnedNew {
      * @param token ERC20 which is being vested
      */
     function emergencyRevoke(IERC20 token) public onlyOwner {
-        require(_revocable, "TokenVesting: cannot revoke");
-        require(!_revoked[address(token)], "TokenVesting: token already revoked");
+        if(!_revocable){
+            revert CannotRevoke();
+        }
+        if(_revoked[address(token)]){
+            revert AlreadyRevoked();
+        }
 
         uint256 balance = token.balanceOf(address(this));
 
         _revoked[address(token)] = true;
 
-        token.safeTransfer(owner(), balance);
+        token.safeTransfer(owner, balance);
 
         emit TokenVestingRevoked(address(token));
     }
