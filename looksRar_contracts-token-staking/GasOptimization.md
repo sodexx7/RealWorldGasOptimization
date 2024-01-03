@@ -1,9 +1,9 @@
 ## TARGET SMART CONTRACT
 
-- [tokenDistributor](contracts/TokenDistributor.sol)
+- [TokenDistributorNew](contracts/TokenDistributorNew.sol) copy [TokenDistributor](contracts/TokenDistributor.sol)
 - test file
-  - yarn test test/tokenDistributor.test.ts
-  - [tokenDistributor.test.ts](test/tokenDistributor.test.ts)
+  - yarn test test/tokenDistributorNew.test.ts
+  - [tokenDistributorNew.test.ts](test/tokenDistributorNew.test.ts) copy [tokenDistributor.test.ts](test/tokenDistributor.test.ts)
 
 ## ENVIRONMENT INFO
 
@@ -61,9 +61,11 @@
 
 ## GAS OPTIMAL LIST
 
+[GasOptimizationList](GasOptimalList.md)
+
 ## PROTOCOL MATERIALS
 
-1. based on below commit hash: -https://github.com/LooksRare/contracts-token-staking
+1. based on below commit hash: -https://github.com/LooksRare/contracts-token-staking 0f9e092e619131cd42be90b3b7b9a8e31880ceda
 2. [Offical web](https://looksrare.org/)
 3. on*chain address * https://docs.looksrare.org/developers/deployed*contract*addresses
    - developer doc https://docs.looksrare.org/developers/welcome
