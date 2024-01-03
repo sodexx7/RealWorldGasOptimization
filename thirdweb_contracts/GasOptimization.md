@@ -1,8 +1,8 @@
 ## TARGET SMART CONTRACT
-*  [Staking721.sol](contracts/extension/Staking721.sol)
+*  [Staking721New.sol](contracts/extension/Staking721New.sol) copy [Staking721.sol](contracts/extension/Staking721.sol)  
 *  test file
-    * forge gas test --mc StakingExtensionTest TODO CHECK
-    * [StakingExtension.t.sol](./src/test/sdk/extension/StakingExtension.t.sol)
+    * forge test --match-contract StakingExtensionTestNew --gas-report
+    * [StakingExtensionNew.t.sol](./src/test/sdk/extension/StakingExtensionNew.t.sol) copy [StakingExtension.t.sol](./src/test/sdk/extension/StakingExtension.t.sol)
 
 ## ENVIRONMENT INFO
 * evm version london
@@ -22,7 +22,9 @@
 **TODO check this logic:test_state_setTimeUnit in [StakingExtension.t.sol](./src/test/sdk/extension/StakingExtension.t.sol)**
 ## GAS COST(CURRENT)
 - OriginalConsumedGas
+ * ***Because Staking721 is a template contract, should create the needed contract based on it while applying it. Current test contract is MyStakingContract, the below functions(balanceOf() / setCondition()) are MyStakingContract's functions. other are Staking721's original functions.*** 
   <img src="OriginalConsumedGas.png" alt="external_result" width="1000"/>
+
 
 
 ## GAS COST(AFTER OPTIMISING)
@@ -32,7 +34,7 @@
 
 ## GAS OPTIMAL LIST
 
-
+[GasOptimizationList](GasOptimizationList.md)
 
 
 
