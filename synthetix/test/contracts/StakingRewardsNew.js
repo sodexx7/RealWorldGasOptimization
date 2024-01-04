@@ -115,7 +115,8 @@ contract('StakingRewardsNew', accounts => {
 				'exit',
 				'getReward',
 				'notifyRewardAmount',
-				'setPaused',
+				'pause',
+				'unpause',
 				'setRewardsDistribution',
 				'setRewardsDuration',
 				'recoverERC20',
@@ -173,10 +174,10 @@ contract('StakingRewardsNew', accounts => {
 			});
 		});
 
-		it('only owner address can call setPaused', async () => {
+		it('only owner address can call paused', async () => {
 			await onlyGivenAddressCanInvoke({
-				fnc: stakingRewards.setPaused,
-				args: [true],
+				fnc: stakingRewards.pause,
+				args: [],
 				address: owner,
 				accounts,
 			});
@@ -185,7 +186,7 @@ contract('StakingRewardsNew', accounts => {
 
 	describe('PausableNew', async () => {
 		beforeEach(async () => {
-			await stakingRewards.setPaused(true, { from: owner });
+			await stakingRewards.pause({ from: owner });
 		});
 		it('should revert calling stake() when paused', async () => {
 			const totalToStake = toUnit('100');
@@ -197,7 +198,7 @@ contract('StakingRewardsNew', accounts => {
 			);
 		});
 		it('should not revert calling stake() when unpaused', async () => {
-			await stakingRewards.setPaused(false, { from: owner });
+			await stakingRewards.unpause({ from: owner });
 
 			const totalToStake = toUnit('100');
 			await stakingToken.transfer(stakingAccount1, totalToStake, { from: owner });
@@ -603,13 +604,13 @@ contract('StakingRewardsNew', accounts => {
 		});
 	});
 
-	describe('notifyRewardAmount()', () => {
+	describe('notifyRewardAmountNew()', () => {
 		let localStakingRewards;
 
 		before(async () => {
 			localStakingRewards = await setupContract({
 				accounts,
-				contract: 'StakingRewards',
+				contract: 'StakingRewardsNew',
 				args: [owner, rewardsDistribution.address, rewardsToken.address, stakingToken.address],
 			});
 
@@ -625,7 +626,7 @@ contract('StakingRewardsNew', accounts => {
 				localStakingRewards.notifyRewardAmount(rewardValue.add(toUnit(0.1)), {
 					from: mockRewardsDistributionAddress,
 				}),
-				'Provided reward too high'
+				web3.eth.abi.encodeFunctionSignature('ProvidedRewardTooHigh()')
 			);
 		});
 
@@ -641,7 +642,7 @@ contract('StakingRewardsNew', accounts => {
 				localStakingRewards.notifyRewardAmount(rewardValue.add(toUnit(0.1)), {
 					from: mockRewardsDistributionAddress,
 				}),
-				'Provided reward too high'
+				web3.eth.abi.encodeFunctionSignature('ProvidedRewardTooHigh()')
 			);
 		});
 	});

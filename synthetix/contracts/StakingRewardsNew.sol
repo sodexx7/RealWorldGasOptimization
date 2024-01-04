@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "./openzeppelin-contracts-new/SafeERC20New.sol";
 import  "./openzeppelin-contracts-new/IERC20.sol";
 import  "./openzeppelin-contracts-new/PausableNew.sol";
+import  "./openzeppelin-contracts-new/OwnedNew.sol";
 import  "./openzeppelin-contracts-new/ReentrancyGuardNew.sol";
 
 // Inheritance
@@ -18,11 +19,12 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
 
     IERC20  public immutable  rewardsToken;
     IERC20  public immutable  stakingToken;
-    uint256 public  periodFinish;
-    uint256 public  rewardRate = 1;
-    uint256 public  rewardsDuration = 7 days;
 
-    uint256 private lastUpdateTime;
+    uint256 public  rewardRate = 1;
+    uint64 public  periodFinish;
+    uint64 public  rewardsDuration = 7 days;
+
+    uint64 private lastUpdateTime;
     uint256 private rewardPerTokenStored;
 
     mapping(address => uint256) private userRewardPerTokenPaid;
@@ -64,8 +66,8 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
         return _balances[account];
     }
 
-    function lastTimeRewardApplicable() public view returns (uint256) {
-        return block.timestamp < periodFinish ? block.timestamp : periodFinish;
+    function lastTimeRewardApplicable() public view returns (uint64) {
+        return uint64(block.timestamp) < periodFinish ? uint64(block.timestamp) : periodFinish;
     }
 
     function rewardPerToken() public view returns (uint256) {
@@ -88,7 +90,7 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function stake(uint256 amount) external nonReentrant notPaused updateReward(msg.sender) {
+    function stake(uint256 amount) external nonReentrant whenNotPaused updateReward(msg.sender) {
       if(amount == 0){
             revert StakeAmountMustGTZero();
         }
@@ -129,7 +131,8 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
         if (block.timestamp >= periodFinish) {
             rewardRate = reward/ rewardsDuration ;
         } else {
-            uint256 remaining = periodFinish - block.timestamp;
+            uint256 remaining;
+            unchecked{ remaining =  periodFinish - block.timestamp;}
             uint256 leftover = remaining * rewardRate;
             rewardRate = (reward + leftover) / rewardsDuration;
         }
@@ -143,8 +146,8 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
             revert ProvidedRewardTooHigh();
         }
 
-        lastUpdateTime = block.timestamp;
-        periodFinish = block.timestamp + rewardsDuration;
+        lastUpdateTime = uint64(block.timestamp);
+        periodFinish = uint64(block.timestamp) + rewardsDuration;
         emit RewardAdded(reward);
     }
 
@@ -157,7 +160,7 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
         emit Recovered(tokenAddress, tokenAmount);
     }
 
-    function setRewardsDuration(uint256 _rewardsDuration) external onlyOwner {
+    function setRewardsDuration(uint64 _rewardsDuration) external onlyOwner {
        
         if(block.timestamp <= periodFinish){
             revert PreviousRewardsShouldDoneBeforeChangDuration();

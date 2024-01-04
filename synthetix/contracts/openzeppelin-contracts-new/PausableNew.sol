@@ -1,58 +1,122 @@
+// SPDX-License-Identifier: MIT
+// OpenZeppelin Contracts (last updated v5.0.0) (utils/Pausable.sol)
 
 pragma solidity ^0.8.0;
 
-// Inheritance
-import "./OwnedNew.sol";
+import {Context} from "./Context.sol";
 
-// https://docs.synthetix.io/contracts/source/contracts/pausable
-abstract contract PausableNew is OwnedNew {
-    uint public lastPauseTime;
-    bool public paused;
+import  "./OwnedNew.sol";
 
-     /**
+/**
+ * @dev Contract module which allows children to implement an emergency stop
+ * mechanism that can be triggered by an authorized account.
+ *
+ * This module is used through inheritance. It will make available the
+ * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
+ * the functions of your contract. Note that they will not be pausable by
+ * simply including this module, only once the modifiers are put in place.
+ */
+abstract contract PausableNew is Context,OwnedNew {
+    bool private _paused;
+
+    /**
+     * @dev Emitted when the pause is triggered by `account`.
+     */
+    event Paused(address account);
+
+    /**
+     * @dev Emitted when the pause is lifted by `account`.
+     */
+    event Unpaused(address account);
+
+    /**
      * @dev The operation failed because the contract is paused.
      */
-     error EnforcedPause();
+    error EnforcedPause();
 
+    /**
+     * @dev The operation failed because the contract is not paused.
+     */
+    error ExpectedPause();
 
+    /**
+     * @dev Initializes the contract in unpaused state.
+     */
     constructor() payable {
-        // This contract is abstract, and thus cannot be instantiated directly
-        if (owner == address(0)) {
-            revert OwnableInvalidOwner(address(0));
-        }
-
-        // Paused will be false, and lastPauseTime will be 0 upon initialisation
+        
     }
 
     /**
-     * @notice Change the paused state of the contract
-     * @dev Only the contract owner may call this.
+     * @dev Modifier to make a function callable only when the contract is not paused.
+     *
+     * Requirements:
+     *
+     * - The contract must not be paused.
      */
-    function setPaused(bool _paused) external onlyOwner {
-        // Ensure we're actually changing the state before we do anything
-        if (_paused == paused) {
-            return;
-        }
-
-        // Set our paused state.
-        paused = _paused;
-
-        // If applicable, set the last pause time.
-        if (paused) {
-            lastPauseTime = block.timestamp;
-        }
-
-        // Let everyone know that our pause state has changed.
-        emit PauseChanged(paused);
+    modifier whenNotPaused() {
+        _requireNotPaused();
+        _;
     }
 
-    event PauseChanged(bool isPaused);
+    /**
+     * @dev Modifier to make a function callable only when the contract is paused.
+     *
+     * Requirements:
+     *
+     * - The contract must be paused.
+     */
+    modifier whenPaused() {
+        _requirePaused();
+        _;
+    }
 
-    modifier notPaused {
-        if(paused){
+    /**
+     * @dev Returns true if the contract is paused, and false otherwise.
+     */
+    function paused() public view virtual returns (bool) {
+        return _paused;
+    }
+
+    /**
+     * @dev Throws if the contract is paused.
+     */
+    function _requireNotPaused() internal view virtual {
+        if (paused()) {
             revert EnforcedPause();
         }
-        _;
+    }
+
+    /**
+     * @dev Throws if the contract is not paused.
+     */
+    function _requirePaused() internal view virtual {
+        if (!paused()) {
+            revert ExpectedPause();
+        }
+    }
+
+    /**
+     * @dev Triggers stopped state.
+     *
+     * Requirements:
+     *
+     * - The contract must not be paused.
+     */
+    function pause() external whenNotPaused onlyOwner {
+        _paused = true;
+        emit Paused(_msgSender());
+    }
+
+    /**
+     * @dev Returns to normal state.
+     *
+     * Requirements:
+     *
+     * - The contract must be paused.
+     */
+    function unpause() external whenPaused onlyOwner {
+        _paused = false;
+        emit Unpaused(_msgSender());
     }
 }
 

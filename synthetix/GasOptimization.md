@@ -16,7 +16,7 @@
 
 
 * For StakingRewards contract, user can stake the stakingToken, then can get the rewardsToken. Both  stakingToken and rewardsToken are ERC20 token, stakingToken can iBTC, or iETH...,rewardsToken is SNX. But for now(20231228) the activities involved with the corrospending's contract is very low. [addresses.md](https://github.com/Synthetixio/synthetix-docs/blob/master/content/addresses.md)
-
+ 
 * StakingRewards Contract based on the below contracts
     1. StakingRewards, basic function stake,withdraw,getRewards
     2. Safe or Privilege management. Pausable,ReentrancyGuard,SafeERC20
@@ -46,9 +46,9 @@
 [GasOptimizationList](GasOptimizationList.md)
 * deployment 
 bytecode size
-12055
+10085
 deployedBytecode size
-10841
+9072
 
 
 ## PROTOCOL MATERIALS
