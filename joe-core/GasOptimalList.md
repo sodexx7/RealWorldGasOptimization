@@ -45,9 +45,45 @@
  
  **Gas cost for All functions(TokenVestingNew) and deployed  have reduced**
 
+
+ 
+4. For storing timestamp changing uint256 to uint64, which is enough. meanwhile add unchecked for _cliff = start + cliffDuration;
+```
+    uint256 private _cliff;
+    uint256 private _start;
+    uint256 private _duration;
+    ======>
+    uint64 public _cliff;
+    uint64 public _start;
+    uint64 public _duration;
+
+    unchecked {_cliff = start + cliffDuration;}
+
+
+```
+
+4. add payable
+
+```
+    TokenVestingNew constructor add payable
+
+    function emergencyRevoke(IERC20 token) external payable onlyOwner {
+    function revoke(IERC20 token) external payable onlyOwner {
+
+```
+
+**Gas Cost V2 build on above change**
+<img src="ConsumedGas_V2.png" alt="external_result" width="1000"/>
+ 
+ **Except deployment gas cost increased,  gas cost for all functions(TokenVestingNew) decreased**
+
+5. Assembly tricks. Can also apply assembly when revert customer error and emit event. but for code readable, just ignore.
+
+
 ## Problems
 1. Uint test doesn't cover al all cases.
 
 
-todo
-1) arbitic uncheck????
+
+SafeERC20New, which inculdes permit function that can reduce the  fees when transfer erc20 token to this address
+

@@ -82,8 +82,52 @@ plus:PausableNew using openzepplin latest version
 **Gas Cost optimiation v2 build on above change**
 <img src="ConsumedGas_V2.png" alt="external_result" width="1000"/>
     * **Most functions's gas cost have reduced, except deploy cost increased, which perhaps caused by using the new PausableNew***
+    * 2beacc50961de083547d73fb3a548a8e2f957a85 commit hash
+    
+
+8. admin funtion add payable 
+```
+StakingRewardsNew
+    setRewardsDuration
+    recoverERC20
 
 
+RewardsDistributionRecipientNew
+    function setRewardsDistribution(address _rewardsDistribution) external payable onlyOwner {
+
+```
+
+9. cache periodFinish,rewardsDuration
+```
+uint64 _periodFinish = periodFinish; // cache periodFinish
+uint64 _rewardsDuration = rewardsDuration;
+```
+**Gas Cost optimiation v3 build on above change**
+<img src="ConsumedGas_V3.png" alt="external_result" width="1000"/>
+     **except deploy and exit funcition gas cost increased,pause、unpause、recoverERC20 keep same, the gas cost for other functions have reduced** 
+    
+
+10. Assembly tricks try. using assembly revert customer error, only save tiny gas meanwhile using log which have increased the gas cost, and considering the code readable, just ignore. 
+
+```
+    // 141591 => 141585  
+    //   if(amount == 0){
+    //         revert StakeAmountMustGTZero();
+    //     } 
+    
+    assembly{
+            if iszero(amount){
+                mstore(0x00,0xbdfa336600000000000000000000000000000000000000000000000000000000) //0xbdfa3366
+                revert(0x00,0x04)  
+            }
+        }
+
+```
+
+
+ProxyERC20, wich creat the staking ERC20 token, can using ERC20 ERC20Permit, save gas for user.
+
+    
     
 
 

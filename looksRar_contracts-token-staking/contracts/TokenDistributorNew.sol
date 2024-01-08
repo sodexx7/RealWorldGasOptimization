@@ -100,7 +100,7 @@ contract TokenDistributorNew is ReentrancyGuardNew {
         uint256[] memory _rewardsPerBlockForOthers,
         uint256[] memory _periodLengthesInBlocks,
         uint256 _numberPeriods
-    ) {
+    ) payable {
         require(
             (_periodLengthesInBlocks.length == _numberPeriods) &&
                 (_rewardsPerBlockForStaking.length == _numberPeriods) &&
@@ -114,7 +114,8 @@ contract TokenDistributorNew is ReentrancyGuardNew {
 
         uint256 amountTokensToBeMinted;
 
-        for (uint256 i = 0; i < _numberPeriods; i++) {
+        uint256 i;
+        do {
             amountTokensToBeMinted +=
                 (_rewardsPerBlockForStaking[i] * _periodLengthesInBlocks[i]) +
                 (_rewardsPerBlockForOthers[i] * _periodLengthesInBlocks[i]);
@@ -124,7 +125,11 @@ contract TokenDistributorNew is ReentrancyGuardNew {
                 rewardPerBlockForOthers: _rewardsPerBlockForOthers[i],
                 periodLengthInBlock: _periodLengthesInBlocks[i]
             });
-        }
+
+            unchecked {
+                ++i;
+            }
+        } while (i < _numberPeriods);
 
         if (amountTokensToBeMinted != nonCirculatingSupply) {
             revert WrongRewardParams();
@@ -221,20 +226,18 @@ contract TokenDistributorNew is ReentrancyGuardNew {
      * @param amount amount to withdraw
      */
     function withdraw(uint256 amount) external nonReentrant {
-        require(
-            (userInfo[msg.sender].amount >= amount) && (amount > 0),
-            "Withdraw: Amount must be > 0 or lower than user balance"
-        );
+        uint256 callerAmount = userInfo[msg.sender].amount;
+        require((callerAmount >= amount) && (amount > 0), "Withdraw: Amount must be > 0 or lower than user balance");
 
         // Update pool
         _updatePool();
 
         // Calculate pending rewards
-        uint256 pendingRewards = ((userInfo[msg.sender].amount * accTokenPerShare) / PRECISION_FACTOR) -
+        uint256 pendingRewards = ((callerAmount * accTokenPerShare) / PRECISION_FACTOR) -
             userInfo[msg.sender].rewardDebt;
 
         // Adjust user information
-        userInfo[msg.sender].amount = userInfo[msg.sender].amount + pendingRewards - amount;
+        userInfo[msg.sender].amount = callerAmount + pendingRewards - amount;
         userInfo[msg.sender].rewardDebt = (userInfo[msg.sender].amount * accTokenPerShare) / PRECISION_FACTOR;
 
         // Adjust total amount staked
@@ -250,7 +253,8 @@ contract TokenDistributorNew is ReentrancyGuardNew {
      * @notice Withdraw all staked tokens and collect tokens
      */
     function withdrawAll() external nonReentrant {
-        if (userInfo[msg.sender].amount == 0) {
+        uint256 callerAmount = userInfo[msg.sender].amount;
+        if (callerAmount == 0) {
             revert WithdrawAmountEqZero();
         }
 
@@ -258,13 +262,13 @@ contract TokenDistributorNew is ReentrancyGuardNew {
         _updatePool();
 
         // Calculate pending rewards and amount to transfer (to the sender)
-        uint256 pendingRewards = ((userInfo[msg.sender].amount * accTokenPerShare) / PRECISION_FACTOR) -
+        uint256 pendingRewards = ((callerAmount * accTokenPerShare) / PRECISION_FACTOR) -
             userInfo[msg.sender].rewardDebt;
 
-        uint256 amountToTransfer = userInfo[msg.sender].amount + pendingRewards;
+        uint256 amountToTransfer = callerAmount + pendingRewards;
 
         // Adjust total amount staked
-        totalAmountStaked = totalAmountStaked - userInfo[msg.sender].amount;
+        totalAmountStaked = totalAmountStaked - callerAmount;
 
         // Adjust user information
         userInfo[msg.sender].amount = 0;

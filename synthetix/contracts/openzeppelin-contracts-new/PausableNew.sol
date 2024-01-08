@@ -102,7 +102,7 @@ abstract contract PausableNew is Context,OwnedNew {
      *
      * - The contract must not be paused.
      */
-    function pause() external whenNotPaused onlyOwner {
+    function pause() external  whenNotPaused onlyOwner {
         _paused = true;
         emit Paused(_msgSender());
     }
@@ -114,7 +114,7 @@ abstract contract PausableNew is Context,OwnedNew {
      *
      * - The contract must be paused.
      */
-    function unpause() external whenPaused onlyOwner {
+    function unpause() external  whenPaused onlyOwner {
         _paused = false;
         emit Unpaused(_msgSender());
     }

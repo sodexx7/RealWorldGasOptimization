@@ -18,7 +18,7 @@ abstract contract RewardsDistributionRecipientNew is OwnedNew {
         _;
     }
 
-    function setRewardsDistribution(address _rewardsDistribution) external onlyOwner {
+    function setRewardsDistribution(address _rewardsDistribution) external payable onlyOwner {
         rewardsDistribution = _rewardsDistribution;
     }
 }

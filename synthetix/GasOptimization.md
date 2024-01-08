@@ -44,7 +44,7 @@
 
 ## GAS OPTIMAL LIST
 [GasOptimizationList](GasOptimizationList.md)
-* deployment 
+* beginning deployment 
 bytecode size
 10085
 deployedBytecode size

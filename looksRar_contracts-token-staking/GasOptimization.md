@@ -2,7 +2,7 @@
 
 - [TokenDistributorNew](contracts/TokenDistributorNew.sol) copy [TokenDistributor](contracts/TokenDistributor.sol)
 - test file
-  - yarn test test/tokenDistributorNew.test.ts
+  - yarn test:gas test/tokenDistributorNew.test.ts
   - [tokenDistributorNew.test.ts](test/tokenDistributorNew.test.ts) copy [tokenDistributor.test.ts](test/tokenDistributor.test.ts)
 
 ## ENVIRONMENT INFO

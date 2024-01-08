@@ -67,7 +67,8 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
     }
 
     function lastTimeRewardApplicable() public view returns (uint64) {
-        return uint64(block.timestamp) < periodFinish ? uint64(block.timestamp) : periodFinish;
+        uint64 _periodFinish = periodFinish; // cache periodFinish
+        return uint64(block.timestamp) < _periodFinish ? uint64(block.timestamp) : _periodFinish;
     }
 
     function rewardPerToken() public view returns (uint256) {
@@ -91,12 +92,17 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     function stake(uint256 amount) external nonReentrant whenNotPaused updateReward(msg.sender) {
-      if(amount == 0){
-            revert StakeAmountMustGTZero();
+        assembly{
+            if iszero(amount){
+                mstore(0x00,0xbdfa336600000000000000000000000000000000000000000000000000000000) //0xbdfa3366
+                revert(0x00,0x04)  
+            }
         }
+
         _totalSupply = _totalSupply + amount;
         _balances[msg.sender] = _balances[msg.sender] + amount;
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
+       
         emit Staked(msg.sender, amount);
     }
 
@@ -128,13 +134,14 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
     /* ========== RESTRICTED FUNCTIONS ========== */
 
     function notifyRewardAmount(uint256 reward) external onlyRewardsDistribution updateReward(address(0)) override(RewardsDistributionRecipientNew){
+        uint64 _rewardsDuration = rewardsDuration;
         if (block.timestamp >= periodFinish) {
-            rewardRate = reward/ rewardsDuration ;
+            rewardRate = reward/ _rewardsDuration ;
         } else {
             uint256 remaining;
             unchecked{ remaining =  periodFinish - block.timestamp;}
             uint256 leftover = remaining * rewardRate;
-            rewardRate = (reward + leftover) / rewardsDuration;
+            rewardRate = (reward + leftover) / _rewardsDuration;
         }
 
         // Ensure the provided reward amount is not more than the balance in the contract.
@@ -142,12 +149,12 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
         // very high values of rewardRate in the earned and rewardsPerToken functions;
         // Reward + leftover must be less than 2^256 / 10^18 to avoid overflow.
         uint balance = rewardsToken.balanceOf(address(this));
-        if(rewardRate > balance / rewardsDuration ){
+        if(rewardRate > balance / _rewardsDuration ){
             revert ProvidedRewardTooHigh();
         }
 
         lastUpdateTime = uint64(block.timestamp);
-        periodFinish = uint64(block.timestamp) + rewardsDuration;
+        periodFinish = uint64(block.timestamp) + _rewardsDuration;
         emit RewardAdded(reward);
     }
 
@@ -160,7 +167,7 @@ contract StakingRewardsNew is IStakingRewardsNew, RewardsDistributionRecipientNe
         emit Recovered(tokenAddress, tokenAmount);
     }
 
-    function setRewardsDuration(uint64 _rewardsDuration) external onlyOwner {
+    function setRewardsDuration(uint64 _rewardsDuration) external payable  onlyOwner {
        
         if(block.timestamp <= periodFinish){
             revert PreviousRewardsShouldDoneBeforeChangDuration();

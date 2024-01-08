@@ -27,9 +27,9 @@ contract TokenVestingNew is OwnedNew {
     address public immutable _beneficiary;
 
     // Durations and timestamps are expressed in UNIX time, the same units as block.timestamp.
-    uint256 public _cliff;
-    uint256 public _start;
-    uint256 public _duration;
+    uint64 public _cliff;
+    uint64 public _start;
+    uint64 public _duration;
 
     bool public _revocable;
 
@@ -63,11 +63,11 @@ contract TokenVestingNew is OwnedNew {
      */
     constructor(
         address beneficiary,
-        uint256 start,
-        uint256 cliffDuration,
-        uint256 duration,
+        uint64 start,
+        uint64 cliffDuration,
+        uint64 duration,
         bool revocable
-    ) OwnedNew(msg.sender) {
+    ) OwnedNew(msg.sender) payable {
         if(beneficiary == address(0)){
             revert InvalidZeroAddress();
         }
@@ -86,7 +86,7 @@ contract TokenVestingNew is OwnedNew {
         _beneficiary = beneficiary;
         _revocable = revocable;
         _duration = duration;
-        _cliff = start + cliffDuration;
+        unchecked {_cliff = start + cliffDuration;}
         _start = start;
     }
 
@@ -109,7 +109,7 @@ contract TokenVestingNew is OwnedNew {
      * @notice Transfers vested tokens to beneficiary.
      * @param token ERC20 token which is being vested
      */
-    function release(IERC20 token) public {
+    function release(IERC20 token) external {
         uint256 unreleased = _releasableAmount(token);
 
         if(unreleased == 0){
@@ -128,7 +128,7 @@ contract TokenVestingNew is OwnedNew {
      * remain in the contract, the rest are returned to the owner.
      * @param token ERC20 token which is being vested
      */
-    function revoke(IERC20 token) public onlyOwner {
+    function revoke(IERC20 token) external payable onlyOwner {
         if(!_revocable){
             revert CannotRevoke();
         }
@@ -154,7 +154,7 @@ contract TokenVestingNew is OwnedNew {
      * anymore, e.g. when he/she has lots its private key.
      * @param token ERC20 which is being vested
      */
-    function emergencyRevoke(IERC20 token) public onlyOwner {
+    function emergencyRevoke(IERC20 token) external payable onlyOwner {
         if(!_revocable){
             revert CannotRevoke();
         }
@@ -187,12 +187,12 @@ contract TokenVestingNew is OwnedNew {
         uint256 currentBalance = token.balanceOf(address(this));
         uint256 totalBalance = currentBalance + _released[address(token)];
 
-        if (block.timestamp < _cliff) {
+        if (uint64(block.timestamp) < _cliff) {
             return 0;
-        } else if (block.timestamp >= _start + _duration || _revoked[address(token)]) {
+        } else if (uint64(block.timestamp) >= _start + _duration || _revoked[address(token)]) {
             return totalBalance;
         } else {
-            return (totalBalance * (block.timestamp - _start)) / _duration;
+            return (totalBalance * (uint64(block.timestamp) - _start)) / _duration;
         }
     }
 }
