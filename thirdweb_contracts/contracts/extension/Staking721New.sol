@@ -283,7 +283,7 @@ abstract contract Staking721New is ReentrancyGuardNew, IStaking721 {
                 revert NotStaker();
             }
 
-            stakerAddress[_tokenIds[j]] = address(0);
+            delete stakerAddress[_tokenIds[j]];
             IERC721(_stakingToken).safeTransferFrom(address(this), _stakeMsgSender(), _tokenIds[j]);
             unchecked{++j;}
         }while(j < len);
@@ -340,7 +340,7 @@ abstract contract Staking721New is ReentrancyGuardNew, IStaking721 {
             endTimestamp: 0
         });
 
-        if (conditionId > 0) {
+        if (conditionId > 1) {
             stakingConditions[conditionId - 1].endTimestamp = block.timestamp;
         }
     }

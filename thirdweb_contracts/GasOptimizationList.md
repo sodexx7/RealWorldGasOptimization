@@ -112,9 +112,16 @@
 <img src="ConsumedGas_V3.png" alt="external_result" width="1000"/>
  ***Although depploy gas cost increased, claimRewards /getStakeInfo /setRewardsPerUnitTime gas cost reduced***
 
+6. gas cost for  avg   | median | max, delete in withdraw funciton has reduced.
+```
+    stakerAddress[_tokenIds[j]] = address(0) ==> delete stakerAddress[_tokenIds[j]];
+```
+
 6. Assembly tricks. Can also apply assembly when revert customer error and emit event. but for code readable, just ignore.
 
  
 
 As seems the Staking721New(template contract) contract will be used more times, so it's better using create2 deploy this contract
-ext = new MyStakingContractNew("Test Staking Contract NEW", "TSCW", address(erc721), timeUnit, rewardsPerUnitTime);
+```
+    ext = new MyStakingContractNew("Test Staking Contract NEW", "TSCW", address(erc721), timeUnit, rewardsPerUnitTime);
+```

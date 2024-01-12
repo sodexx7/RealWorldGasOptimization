@@ -194,7 +194,7 @@ contract('StakingRewardsNew', accounts => {
 			await stakingToken.approve(stakingRewards.address, totalToStake, { from: stakingAccount1 });
 			await assert.revert(
 				stakingRewards.stake(totalToStake, { from: stakingAccount1 }),
-				web3.eth.abi.encodeFunctionSignature('EnforcedPause()') // error EnforcedPause();  0xd93c0665 // todo should check web3.eth.abi.encodeFunctionSignature('EnforcedPause()') can work??
+				web3.eth.abi.encodeFunctionSignature('EnforcedPause()') // error EnforcedPause();  0xd93c0665
 			);
 		});
 		it('should not revert calling stake() when unpaused', async () => {

@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import "./openzeppelin-contracts-new/OwnedNew.sol";
 import "./openzeppelin-contracts-new/SafeERC20New.sol";
+import "./openzeppelin-contracts-new/ReentrancyGuardNew.sol";
 
 /**
  * @title TokenVesting
@@ -11,7 +12,7 @@ import "./openzeppelin-contracts-new/SafeERC20New.sol";
  * typical vesting scheme, with a cliff and vesting period. Optionally revocable by the
  * owner.
  */
-contract TokenVestingNew is OwnedNew {
+contract TokenVestingNewOptimal is OwnedNew, ReentrancyGuardNew {
     // The vesting schedule is time-based (i.e. using block timestamps as opposed to e.g. block numbers), and is
     // therefore sensitive to timestamp manipulation (which is something miners can do, to a certain degree). Therefore,
     // it is recommended to avoid using short time durations (less than a minute). Typical vesting schemes, with a
@@ -36,6 +37,9 @@ contract TokenVestingNew is OwnedNew {
     mapping(address => uint256) private _released;
     mapping(address => bool) private _revoked;
 
+    // security 3 add rewardsTokenAmount is for checking the rewardToken, and the totalBalance
+    mapping(address => uint256) private rewardsTokenAmount;
+
     // custom error
     error InvalidZeroAddress(); // TokenVesting: beneficiary is the zero address
 
@@ -50,6 +54,10 @@ contract TokenVestingNew is OwnedNew {
     error CannotRevoke();      //  TokenVesting: cannot revoke
 
     error AlreadyRevoked();  // token already revoked
+
+    error NonRequiredAddress(); // check caller is the beneficiary address
+
+    error NonRequiredToken(); // check the input token is the required token
 
     /**
      * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
@@ -109,7 +117,18 @@ contract TokenVestingNew is OwnedNew {
      * @notice Transfers vested tokens to beneficiary.
      * @param token ERC20 token which is being vested
      */
-    function release(IERC20 token) external {
+    //  security 2 add nonReentrant
+    function release(IERC20 token) external nonReentrant{
+        // security 1 add _beneficiary address check
+        if(msg.sender != _beneficiary){
+            revert NonRequiredAddress();
+        }
+
+        //security 3: check token is the required token 
+        if(rewardsTokenAmount[address(token)] == 0){
+            revert NonRequiredToken();
+        }
+
         uint256 unreleased = _releasableAmount(token);
 
         if(unreleased == 0){
@@ -158,17 +177,25 @@ contract TokenVestingNew is OwnedNew {
         if(!_revocable){
             revert CannotRevoke();
         }
-        if(_revoked[address(token)]){
-            revert AlreadyRevoked();
-        }
+        // security 4: remove the below check, so the owner can get all balance.
+        // if(_revoked[address(token)]){
+        //     revert AlreadyRevoked();
+        // }
 
         uint256 balance = token.balanceOf(address(this));
 
-        _revoked[address(token)] = true;
+        // _revoked[address(token)] = true;
 
         token.safeTransfer(owner, balance);
 
         emit TokenVestingRevoked(address(token));
+    }
+
+    // security 3: when owner send the rewards token meanwhile updating the rewardsTokenAmount. 
+    function rewardsTokenConfig(IERC20 token,uint256 amount) external payable onlyOwner{
+
+        token.transferFrom(msg.sender,address(this),amount);
+        rewardsTokenAmount[address(token)] = amount;
     }
 
     /**
@@ -184,18 +211,18 @@ contract TokenVestingNew is OwnedNew {
      * @param token ERC20 token which is being vested
      */
     function _vestedAmount(IERC20 token) private view returns (uint256) {
-        uint256 currentBalance = token.balanceOf(address(this));
-        uint256 totalBalance = currentBalance + _released[address(token)];
+        // uint256 currentBalance = token.balanceOf(address(this));
+        // uint256 totalBalance = currentBalance + _released[address(token)];
+        //security 3: add  totoalBalnce should record in advance, which prevent others change this value
+        uint256 totalBalance = rewardsTokenAmount[address(token)];
 
+        // security 5: delete _revoked[address(token)]. For my understanding, the vestAmount should based on the totalBalance, which shouldn't substract the revoke balance
         if (uint64(block.timestamp) < _cliff) {
             return 0;
-        } else if (uint64(block.timestamp) >= _start + _duration || _revoked[address(token)]) {
+        } else if (uint64(block.timestamp) >= _start + _duration /**|| _revoked[address(token)]  */) {
             return totalBalance;
         } else {
-            return (totalBalance * (uint64(block.timestamp) - _start)) / _duration;
+            return totalBalance * (uint64(block.timestamp) - _start) / _duration;
         }
     }
 }
-
-
-

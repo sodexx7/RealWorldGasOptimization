@@ -23,7 +23,7 @@ describe.only("TokenVestingNew", function () {
     blockTimestamp = (await ethers.provider.getBlock("latest")).timestamp
     this.joe = await this.JoeToken.deploy()
     this.tokenVesting = await this.TokenVesting.deploy(this.alice.address, blockTimestamp, CLIFF_LENGTH, DURATION, true)
-    this.joe.mint(this.tokenVesting.address, 100)
+    this.joe.mint(this.tokenVesting.address, 1)
   })
 
   it("should only allow release of tokens once cliff is passed", async function () {
@@ -33,7 +33,7 @@ describe.only("TokenVestingNew", function () {
     await increase(duration.days(1))
     await this.tokenVesting.release(this.joe.address)
     expect(await this.joe.balanceOf(this.alice.address)).to.gt(0)
-    expect(await this.joe.balanceOf(this.tokenVesting.address)).to.lt(100)
+    expect(await this.joe.balanceOf(this.tokenVesting.address)).to.lt(1)
   })
 
   it("should allow all tokens to be vested once all time has passed", async function () {

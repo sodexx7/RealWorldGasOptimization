@@ -44,12 +44,9 @@
 
 ## GAS OPTIMAL LIST
 [GasOptimizationList](GasOptimizationList.md)
-* beginning deployment 
-bytecode size
-10085
-deployedBytecode size
-9072
 
+## SECURITY CONSIDERATIONS
+[SecurityConsiderations](SecurityConsiderations.md)
 
 ## PROTOCOL MATERIALS
 
