@@ -197,7 +197,6 @@ contract TokenDistributorNew is ReentrancyGuardNew {
 
         // Return if no pending rewards
         if (pendingRewards == 0) {
-            // TODO check blew logic
             // It doesn't throw revertion (to help with the fee-sharing auto-compounding contract)
             return;
         }
@@ -358,7 +357,6 @@ contract TokenDistributorNew is ReentrancyGuardNew {
             endBlock += stakingPeriod[currentPhase].periodLengthInBlock;
 
             // Adjust multiplier to cover the missing periods with other lower inflation schedule
-            // TODO check
             uint256 newMultiplier = _getMultiplier(previousEndBlock, block.number);
 
             // Adjust token rewards

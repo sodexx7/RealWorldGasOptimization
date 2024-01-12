@@ -27,7 +27,7 @@
 
 
 ## GAS COST(AFTER OPTIMISING)
-
+<img src="ConsumedGas_V3.png" alt="external_result" width="1000"/>
 
 
 

@@ -11,3 +11,10 @@
 # Related materials
 
 1. [smart-contract-creation-cost](https://www.rareskills.io/post/smart-contract-creation-cost)
+2. [staking-algorithm](https://www.rareskills.io/post/staking-algorithm)
+3. [Mychecklist](MyCheckListForGasOptimiation.md)
+
+
+
+# TODO
+* There are a great number of the unit test cases, especially for the syncheix, Looksrare. some have ignored. 

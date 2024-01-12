@@ -62,4 +62,3 @@ do {
 
 Lookes rare as ERC20 token, can implemment ERC20Permit, save gas for user
 
-## Problems

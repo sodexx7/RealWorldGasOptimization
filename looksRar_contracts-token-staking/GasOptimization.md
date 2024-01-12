@@ -19,7 +19,8 @@
 - tokenDistributor contract's related contracts as below
   1. Depend on which contracts
   - Safe or Privilege management. ReentrancyGuard,SafeERC20
-  - ILooksRareToken: the LooksRareToken,tokenSplitter: tokenRewardForOthers(team + treasury + trading rewards)
+  - ILooksRareToken: the LooksRareToken,
+  - tokenSplitter: tokenRewardForOthers(team + treasury + trading rewards)
   2. Which contracts depend on tokenDistributor?
   - FeeSharingSystem
     > This smart contract is an additional layer on top of the TokenDistributor contract, which also unlocks WETH rewards, stemming from the LooksRare exchange's protocol fee collected at every trade.
@@ -41,6 +42,7 @@
   - Based on block, not timestamp
   - Rewards config more flexible,such as each staking period can have different blocks.
   - Has auto-compounding
+- [TokenDistributorImplementation notes](TokenDistributorImplementation.md)
 
 **Reference**
 
@@ -58,16 +60,26 @@
   <img src="OriginalConsumedGas.png" alt="external_result" width="1000"/>
 
 ## GAS COST(AFTER OPTIMISING)
+<img src="ConsumedGas_V2.png" alt="external_result" width="1000"/>
 
 ## GAS OPTIMAL LIST
-
 [GasOptimizationList](GasOptimalList.md)
 
 ## PROTOCOL MATERIALS
 
 1. based on below commit hash: -https://github.com/LooksRare/contracts-token-staking 0f9e092e619131cd42be90b3b7b9a8e31880ceda
 2. [Offical web](https://looksrare.org/)
-3. on*chain address * https://docs.looksrare.org/developers/deployed*contract*addresses
+3. onchain address https://docs.looksrare.org/developers/deployed 
    - developer doc https://docs.looksrare.org/developers/welcome
 
-https://etherscan.io/address/0xBcD7254A1D759EFA08eC7c3291B2E85c5dCC12ce
+
+https://etherscan.io/address/0x465A790B428268196865a3AE2648481ad7e0d3b1
+
+## Question
+
+```
+  // below : which potential issues?
+  // It allows protection against potential issues to prevent funds from being locked
+  // todo check WHY???
+bool mintStatus = looksRareToken.mint(address(this), tokenRewardForStaking);
+```

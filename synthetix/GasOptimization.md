@@ -36,11 +36,7 @@
 - related code version: 970f1daadfb6ea2414f9612f40d66e684481f042
 
 ## GAS COST(AFTER OPTIMISING)
-
-
-
-
-
+  <img src="ConsumedGas_V3.png" alt="external_result" width="1000"/>
 
 ## GAS OPTIMAL LIST
 [GasOptimizationList](GasOptimizationList.md)

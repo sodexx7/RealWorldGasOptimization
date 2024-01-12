@@ -23,6 +23,10 @@
 * TokenVesting use below contracts
     1. Safe or Privilege management. SafeERC20 Owned
 
+* Seems like stock share lockout plan 
+<img src="Joe-TokenVesting.png" alt="external_result" width="1000"/>
+
+
 * Quesiton. Now doesn't see other smart contracts are using this contract meanwhile doesn't find this contract have been deployed.
 
 
@@ -33,7 +37,7 @@
 - related code version: 9c61416c8068d7050e8999cb66ef352795e04a7f
 
 ## GAS COST(AFTER OPTIMISING)
-
+<img src="ConsumedGas_V2.png" alt="external_result" width="1000"/>
 
 ## GAS OPTIMAL LIST
 

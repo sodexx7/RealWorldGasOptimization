@@ -49,9 +49,9 @@
     }
 ```
 
-## 3. Precious problem
+## 3. Precision problem
 
-For the calculation `(totalBalance * (uint64(block.timestamp) - _start)) / _duration;` which don't consider the precious problem, what's the precious of this formula? if totalBalance * (uint64(block.timestamp) - _start) < _duration, how to deal with it?
+For the calculation `(totalBalance * (uint64(block.timestamp) - _start)) / _duration;` which don't consider the precision problem, what's the precision of this formula? if totalBalance * (uint64(block.timestamp) - _start) < _duration, how to deal with it?
 
 ```
     function _vestedAmount(IERC20 token) private view returns (uint256) {
