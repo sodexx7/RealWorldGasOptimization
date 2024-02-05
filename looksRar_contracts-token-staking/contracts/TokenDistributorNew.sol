@@ -115,6 +115,7 @@ contract TokenDistributorNew is ReentrancyGuardNew {
         uint256 amountTokensToBeMinted;
 
         uint256 i;
+        require(_numberPeriods>1);
         do {
             amountTokensToBeMinted +=
                 (_rewardsPerBlockForStaking[i] * _periodLengthesInBlocks[i]) +
